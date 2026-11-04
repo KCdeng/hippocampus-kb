@@ -1,13 +1,10 @@
 # 海马体 · 本地知识库检索引擎
 
+语言：简体中文 | [English](README.en.md)
+
 面向**个人服务器自用**的 Markdown 知识库检索：BM25 词面 + ONNX dense 向量双路，
 融合排序，常驻 HTTP 服务毫秒级返回，结果带文件名与行号可回查原文。
 不依赖数据库、不依赖向量库、不需要 GPU，磁盘上的文件就是唯一真相。
-
-English: a self-hosted, stdlib-served hybrid retrieval engine for Markdown knowledge bases.
-Chunking is heading-aware; BM25 and dense (bge-m3 ONNX) scores are fused; every index swap is
-atomic and every search-quality change must pass a machine gate recorded in `baseline.json`.
-Written for a single operator on a personal server — it binds to 127.0.0.1 and has no auth layer.
 
 ```
 POST /search {"query": "...", "k": 8}        → 命中的块 + 出处文件 + 行号

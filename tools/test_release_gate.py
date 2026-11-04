@@ -159,5 +159,50 @@ class FrontageTest(unittest.TestCase):
             self.assertIn(token, txt, f"README 没交代发布边界（缺关键词 {token}）")
 
 
+class ReadmeLanguagePairTest(unittest.TestCase):
+    """About 栏挂 "Language: 简体中文 | English" 就必须真有第二个文件、且互链闭合。
+
+    要拦的事故：描述里写了语言切换，链接却指向不存在的文件——外人第一屏点进 404，
+    比根本没有切换栏更糟。另一半事故是英文版写成一份"精简宣传页"，与中文版口径漂移。
+    """
+
+    def setUp(self):
+        self.dist = _pack_once()
+        self.paths = _paths(self.dist)
+        self.zh = _read(self.dist, "README.md")
+        self.en = (_read(self.dist, "README.en.md")
+                   if "README.en.md" in self.paths else "")
+
+    def test_english_readme_is_shipped(self):
+        self.assertIn("README.en.md", self.paths,
+                      "README.md 声称有英文版，但打包名单里没有 README.en.md")
+
+    def test_the_two_readmes_link_to_each_other(self):
+        self.assertIn("(README.en.md)", self.zh, "中文 README 的语言行没链到英文版")
+        self.assertIn("(README.md)", self.en, "英文 README 的语言行没链回中文版")
+
+    def test_language_line_sits_directly_under_the_title(self):
+        for name, txt in (("README.md", self.zh), ("README.en.md", self.en)):
+            head = txt.splitlines()[:4]
+            self.assertTrue(head and head[0].startswith("# "), f"{name} 第一行应是标题")
+            self.assertTrue(any("README" in l for l in head[1:4]),
+                            f"{name} 标题下 3 行内必须有语言切换行，实际是 {head!r}")
+
+    def test_english_covers_every_section_of_the_chinese_one(self):
+        """小节数相等 = 英文版不是缩略宣传页；数字相等 = 实测口径没被改写。"""
+        n_zh = len([l for l in self.zh.splitlines() if l.startswith("## ")])
+        n_en = len([l for l in self.en.splitlines() if l.startswith("## ")])
+        self.assertEqual(n_en, n_zh, f"英文版小节数 {n_en} ≠ 中文版 {n_zh}，两边口径已漂移")
+
+    def test_english_keeps_the_measured_claims(self):
+        for token in ("34", "81.8", "96.4", "4469", "40 MB", "127.0.0.1", "exit 1",
+                      "kb/baseline.json", "kb_atomic"):
+            self.assertIn(token, self.en, f"英文版丢了可核对的实测口径：{token}")
+
+    def test_english_declares_what_is_not_published(self):
+        for token in ("corpus", "memory", "baseline"):
+            self.assertIn(token, self.en, f"英文版没交代发布边界（缺关键词 {token}）")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

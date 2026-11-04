@@ -59,6 +59,7 @@ def manifest():
 # release/ 下放的是"只为发布写的内容"，落到仓库里的目标路径
 RELEASE_ONLY = [
     ("README.md", "README.md"),
+    ("README_en.md", "README.en.md"),
     ("LICENSE", "LICENSE"),
     ("requirements.txt", "requirements.txt"),
     ("gitignore", ".gitignore"),
