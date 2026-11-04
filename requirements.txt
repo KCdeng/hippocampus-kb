@@ -1,0 +1,6 @@
+# 下面四个是发布件里全部第三方 import（按白名单代码 grep 得出）。
+# 模型权重不在此列：ONNX 的 bge-m3 需自己拉，见 README 的「准备模型」一节。
+jieba==0.42.1
+numpy==2.5.4
+onnxruntime==1.31.1
+tokenizers==0.23.3

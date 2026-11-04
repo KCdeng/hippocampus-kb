@@ -1,0 +1,31 @@
+{
+  "note": "示例语料（corpus/ 下 8 个自撰 Markdown，切成 34 块）上的机器闸门。数字来自 2026-11-04 在全新发布目录里的一次实跑：chunker.py → build_vec.py --out vec_m3.npy → index.py → eval.py（bge-m3 ONNX fp32，CPU 后端，24 题）。重跑命令见 README 的「开箱跑通」。",
+  "gate": {
+    "hit5_min": 0.9166,
+    "filehit5_min": 0.9583,
+    "note": "实测 23/24=95.8% 与 24/24=100.0%；闸门各留一题余量——示例语料只有 34 块，一题的换位就是 4 个百分点，切块或嵌入实现若有任何无害的口径漂移（jieba 版本、词表排序），把闸门钉在实测值会让 clone 的人看到 FAIL 而怀疑自己。闸门的作用是拦住真的退化，不是拦住四舍五入。"
+  },
+  "baseline": {
+    "tag": "EXP-v0",
+    "chunks": 34,
+    "bm25_vocab": 1060,
+    "vec": "vec_m3.npy",
+    "vec_shape": [34, 1024],
+    "model": "bge-m3-onnx",
+    "mode": "hybrid-v2",
+    "hyb_w": 0.5,
+    "hit1": 0.75,
+    "hit3": 0.875,
+    "hit5": 0.958,
+    "mrr": 0.823,
+    "filehit5": 1.0,
+    "n_questions": 24,
+    "miss": ["qe004"],
+    "reference": {
+      "grep": 0.167,
+      "bm25": 0.833,
+      "vec": 0.875,
+      "hybrid": 0.958
+    }
+  }
+}

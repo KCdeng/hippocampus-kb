@@ -1,0 +1,42 @@
+{
+  "note": "过闸门的生产基线。改检索/切片配置后必须跑 eval.py 与本文件比对，未过闸门不得进生产。",
+  "gate": { "hit5_min": 0.8181, "filehit5_min": 0.9636, "note": "55 题：45/55=81.818%、53/55=96.364%；文档里的 81.8/96.4 是四舍五入，闸门用精确分数" },
+  "baseline": {
+    "tag": "V3",
+    "chunks": 1436,
+    "bm25_vocab": 11645,
+    "vec": "vec_m3.npy",
+    "vec_shape": [1436, 1024],
+    "model": "bge-m3-onnx",
+    "mode": "hybrid-v2",
+    "hyb_w": 0.5,
+    "hit1": 0.455, "hit3": 0.673, "hit5": 0.818, "mrr": 0.583, "filehit5": 0.964,
+    "miss": ["q005", "q007", "q008", "q009", "q010", "q013", "q015", "q022", "q040", "q053"]
+  },
+  "measured_failures": [
+    { "tag": "V4", "change": "chunker 手术（表格按行组袋+标题并正文）", "chunks": 1780,
+      "hit5": 0.782, "filehit5": 1.0, "verdict": "FAIL：BM25 61.8→65.5，dense 69.1→63.6" },
+    { "tag": "V5h", "change": "V4 块 + 嵌入文本拼标题链", "chunks": 1780,
+      "hit5": 0.782, "filehit5": 0.945, "mrr": 0.533, "verdict": "FAIL：dense 63.6→65.5，混合档没涨" },
+    { "tag": "armB", "change": "KB_ROW_NL=1 每行追加「列名=值」（列对齐已修，同代对照 base 1745 块）", "chunks": 1884,
+      "bm25_hit5": 0.691, "hit5": 0.764, "filehit5": 0.982, "mrr": 0.588,
+      "verdict": "FAIL：BM25 单档 +1.8pp（67.3→69.1）但 hybrid-v2 相对 base 80.0/100.0 掉到 76.4/98.2；合成标签不改 dense、块数+8% 稀释候选池。证据 kb/CHUNKING-EVIDENCE.md §3.8" },
+    { "tag": "CTX-main", "change": "KB_CTX_CHARS=600 表格块挂上方散文窗（同代对照 base）", "chunks": 1746,
+      "hit5": 0.800, "filehit5": 1.0, "mrr": 0.577,
+      "verdict": "无效：57/1746 块文本变化（56 块纯挂前缀、平均 160 字，真表格块只有 9 个），55 题 × 4 档零名次变化；语料普查显示四条件联合目标表 0/1007，CTX 在本库没有作用对象。证据 kb/CHUNKING-EVIDENCE.md §3.1" },
+    { "tag": "base20261103", "change": "今日 chunker 默认参数重切主库（非杠杆，是换代候选）", "chunks": 1745,
+      "hit5": 0.800, "filehit5": 1.0, "mrr": 0.577,
+      "verdict": "不上线：文件级 96.4→100.0，但 hit@5 45→44 题（救回 q007/q022/q053，新增丢失 q012/q027/q028）；缺口归因未查清前不得换档。见 CHUNKING-EVIDENCE.md §7.4" },
+    { "tag": "hybrid-r", "change": "V3 块 + hybrid(RRF) 粗排 top-20 → bge-reranker-base 精排（同一金标准、同一块与向量档）", "chunks": 1436,
+      "hit1": 0.382, "hit3": 0.527, "hit5": 0.600, "mrr": 0.487, "filehit5": 0.927,
+      "per_type_hit5": { "keyword": 0.682, "semantic": 0.400, "multi": 0.769 },
+      "latency_s_per_query": [21.9, 23.6],
+      "verdict": "FAIL：hit@5 60.0% 比生产 hybrid-v2 81.8% 低 21.8pp，连自己的粗排底子 hybrid 78.2% 也低 18.2pp。22 道落空题拆解＝粗排池本没有 gold 8 题 ＋ gold 在池 6~20 名没捞进@5 共 1 题 ＋ gold 本在粗排@5 被精排挤出去 13 题（救回只有 3 题）。挤掉组的 480 字截断暴露率 2/13 ≈ 全库基线 7/54，截断不是主因，主因是精排模型自身排序分歧；分题型全线下跌（semantic 80→40 最惨），旧口径「精排对表格行更好」在 V3 上被推翻。证据 kb/CHUNKING-EVIDENCE.md §3.11、kb/scratch/rerank_diag.py" }
+  ],
+  "rollback": {
+    "chunks": "chunks_v2.bak -> chunks.jsonl",
+    "vec": "vec_m3_v2.bak -> vec_m3.npy",
+    "bm25": "index.py 重建（确定性，b=0.75）",
+    "then": "重启 8310（服务不热重载）"
+  }
+}

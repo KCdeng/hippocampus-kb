@@ -1,0 +1,36 @@
+# 语料正文与它的一切派生物：切块档是正文的二次拷贝，词表会从语料里学出字符串
+kb/chunks*.jsonl
+kb/bm_vocab.json
+kb/meta.json
+kb/bm25*.npy
+kb/vec*.npy
+kb/*.provenance.json
+*.prev.*
+*.new.*
+*.bak
+
+# 运行产物：含真实查询文本与会话记忆
+kb/query_log.jsonl
+kb/reload_history.jsonl
+kb/serve.out.log
+kb/serve.err.log
+kb/serve.out
+kb/serve.err
+kb/*.log
+kb/*.out
+kb/*.err
+kb/eval_per_query*.json
+kb/replay_*.jsonl
+
+# 记忆区与复盘区（智能体写回的会话产物，不是知识文档）
+kb/mem/
+kb/epi/
+
+# 模型权重与依赖
+models/
+venv/
+__pycache__/
+*.pyc
+
+# 发布工具链的本地一侧：含作者本机路径与身份字面量
+tools/release_local.json

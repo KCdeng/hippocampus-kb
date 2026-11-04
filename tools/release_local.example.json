@@ -1,0 +1,16 @@
+{
+  "_note": "pack_release.py 需要的替换表的**形态**示例。真实那份含作者本机路径与第三方厂商名，故意不发布。要自己发一份：复制成 release_local.json，把 <占位> 换成你自己的字面量。",
+  "banned": ["<你的 Windows 用户名>", "<你的登录名>", "<不想公开的第三方名称>"],
+  "global": [
+    ["X:\\Home\\<你的用户名>", "<本地用户目录>"],
+    ["D:\\<你的工作区目录>", "<本地工作区>"]
+  ],
+  "files": {
+    "kb/chunker.py": [
+      ["--root\", default=r\"D:\\<你的工作区目录>\"", "--root\", default=os.environ.get(\"KB_ROOT\", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), \"corpus\"))"]
+    ],
+    "kb/m3embed.py": [
+      ["os.environ.get(\"M3_ONNX_DIR\", r\"D:\\<你的模型目录>\")", "os.environ.get(\"M3_ONNX_DIR\", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), \"models\", \"bge-m3-onnx\"))"]
+    ]
+  }
+}
